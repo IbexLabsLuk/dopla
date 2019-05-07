@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Lukas Meyer
+  description: Ansible role to preconfigure nodes for kubernetes rollout using RKE.
+  license: MIT
+  min_ansible_version: 2.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - bionic
+  categories:
+    - datacenter
+# dependencies:
+#   - role: dopla-base
+#   - role: dopla-docker

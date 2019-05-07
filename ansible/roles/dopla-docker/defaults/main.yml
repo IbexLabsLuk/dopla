@@ -1,0 +1,19 @@
+---
+# Default IP for the bridge of the internal interface.
+dopla_ip: 10.10.10.1
+# Subnet mask
+dopla_ip_cidr: 8
+# Internal domain
+dopla_int_domain: dopla.lan
+# Controller hostname
+dopla_int_host_controller: controller
+dopla_int_ip_controller: 10.10.10.1
+# Internal logging hostname
+dopla_int_host_logging: logging
+dopla_int_ip_logging: 10.10.10.1
+# Dopla Upstream DNS
+dopla_dns_upstream: [8.8.8.8, 8.8.4.4]
+# Dopla internal dns resolvers, generated from dopla_ip
+dopla_int_dns: []
+# Dopla registries
+dopla_registries: []

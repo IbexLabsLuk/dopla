@@ -1,0 +1,6 @@
+.DS_Store
+ansible/inventory/group_vars/all.yml
+ansible/playbook.retry
+ansible/inventory/hosts.ini
+ansible/inventory/testing.ini
+ansible/fetch

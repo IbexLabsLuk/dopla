@@ -1,0 +1,47 @@
+# Domain for dopla
+dopla_domain: example.com
+# Dopla admin mail
+dopla_admin_mail: admin@example.com
+
+# Controller hostname
+dopla_host_controller: controller
+dopla_int_ip_controller: 192.168.254.1
+# Internal logging hostname
+dopla_host_logging: logging
+dopla_int_ip_logging: 192.168.254.1
+# Internal logging hostname
+dopla_host_ldap: ldap
+dopla_int_ip_ldap: 192.168.254.1
+
+# Volume directory
+dopla_volume_path: /volumes
+
+# Volumes to precreate
+dopla_volumes:
+  - demolicious
+  - dopla-devops-git
+  - dopla-devops-registry
+  - dopla-devops-pip
+  - vol01
+  - vol02
+  - vol03
+  - vol04
+  - vol05
+
+# LDAP
+# LDAP Organization
+dopla_ldap_org: "Example LLC"
+# LDAP Admin Password
+dopla_ldap_admin_pass: "pass123"
+# LDAP Config Password
+dopla_ldap_config_pass: "pass123"
+
+# DNS
+# Default DNS admin user
+dopla_dns_admin_user: "admin"
+# Default DNS admin user password:
+dopla_dns_admin_pass: "pass123"
+# Default upstream dns
+dopla_dns_upstream:
+  - 8.8.8.8
+  - 8.8.4.4

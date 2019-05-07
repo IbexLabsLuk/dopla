@@ -1,0 +1,16 @@
+- name: Create Cluster config directory.
+  become: true
+  file: 
+    path: "{{dopla_volume_path}}"
+    state: directory
+    mode: 0755
+- become: true
+  file: 
+    path: "{{dopla_volume_path}}/pvs"
+    state: directory
+    mode: 0777
+- become: true
+  file: 
+    path: "{{dopla_volume_path}}/pvc"
+    state: directory
+    mode: 0777

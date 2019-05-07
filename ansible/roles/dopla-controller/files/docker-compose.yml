@@ -1,0 +1,119 @@
+version: '3'
+
+volumes:
+  # Controller volumes
+  controller:
+  # Log volumes
+  logging:
+
+services:
+  # Rancher host
+  controller:
+    image: rancher/rancher:stable
+    restart: unless-stopped
+    volumes:
+      - controller:/var/lib/rancher
+    ports:
+      - 80:80
+      - 443:443
+    command: ["--acme-domain", "${CONTROLLER_HOST}.${DOPLA_DOMAIN}"]
+
+  # Add Nginx to serve prepared yamls for cluster bootstrap
+  bootstrap:
+    image: nginx
+    restart: unless-stopped
+    volumes:
+      - /etc/dopla/clusters:/usr/share/nginx/html:ro
+    ports:
+      - ${DOPLA_INT_IP_CONTROLLER}:9999:80
+
+  # Internal
+  internal-dns:
+    image: jpillora/dnsmasq
+    restart: unless-stopped
+    volumes:
+      - /etc/dopla/dns/dnsmasq.conf:/etc/dnsmasq.conf
+    environment:
+      HTTP_USER: "${DOPLA_DNS_ADMIN_USER}"
+      HTTP_PASS: "${DOPLA_DNS_ADMIN_PASS}"
+    ports:
+      - ${DOPLA_INT_IP_CONTROLLER}:53:53/udp
+      - ${DOPLA_INT_IP_CONTROLLER}:8153:5380
+
+  # Elastic and Kibana for logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+    restart: unless-stopped
+    volumes:
+      - logging:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx3g -Xms3g"
+      node.name: elasticsearch
+      cluster.name: ${LOGGING_HOST}.${DOPLA_DOMAIN}
+      # cluster.initial_master_nodes: elasticsearch
+    ports:
+      - ${DOPLA_INT_IP_LOGGING}:9200:9200
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.7.1
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ${LOGGING_HOST}.${DOPLA_DOMAIN}
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - ${DOPLA_INT_IP_LOGGING}:5601:5601
+
+  openldap:
+    image: osixia/openldap:latest
+    container_name: openldap
+    environment:
+      LDAP_LOG_LEVEL: "256"
+      LDAP_ORGANISATION: "${DOPLA_LDAP_ORG}"
+      LDAP_DOMAIN: "${DOPLA_DOMAIN}"
+      LDAP_BASE_DN: ""
+      LDAP_ADMIN_PASSWORD: "${DOPLA_LDAP_ADMIN_PASS}"
+      LDAP_CONFIG_PASSWORD: "${DOPLA_LDAP_CONFIG_PASS}"
+      LDAP_READONLY_USER: "false"
+      #LDAP_READONLY_USER_USERNAME: "readonly"
+      #LDAP_READONLY_USER_PASSWORD: "readonly"
+      LDAP_RFC2307BIS_SCHEMA: "false"
+      LDAP_BACKEND: "mdb"
+      LDAP_TLS: "false"
+      #LDAP_TLS_CRT_FILENAME: "ldap.crt"
+      #LDAP_TLS_KEY_FILENAME: "ldap.key"
+      #LDAP_TLS_DH_PARAM_FILENAME: "dhparam.pem"
+      #LDAP_TLS_CA_CRT_FILENAME: "ca.crt"
+      #LDAP_TLS_ENFORCE: "false"
+      #LDAP_TLS_CIPHER_SUITE: "SECURE256:-VERS-SSL3.0"
+      #LDAP_TLS_PROTOCOL_MIN: "3.1"
+      #LDAP_TLS_VERIFY_CLIENT: "demand"
+      #LDAP_REPLICATION: "false"
+      #LDAP_REPLICATION_CONFIG_SYNCPROV: "binddn="cn=admin,cn=config" bindmethod=simple credentials=$LDAP_CONFIG_PASSWORD searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1 starttls=critical"
+      #LDAP_REPLICATION_DB_SYNCPROV: "binddn="cn=admin,$LDAP_BASE_DN" bindmethod=simple credentials=$LDAP_ADMIN_PASSWORD searchbase="$LDAP_BASE_DN" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1 starttls=critical"
+      #LDAP_REPLICATION_HOSTS: "#PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
+      KEEP_EXISTING_CONFIG: "true"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+      LDAP_SSL_HELPER_PREFIX: "ldap"
+    tty: true
+    stdin_open: true
+    volumes:
+      - /var/lib/ldap
+      - /etc/ldap/slapd.d
+      - /container/service/slapd/assets/certs/
+    ports:
+      - "${DOPLA_INT_IP_CONTROLLER}:389:389"
+      - "${DOPLA_INT_IP_CONTROLLER}:636:636"
+    domainname: "{{dopla_domain}}" # important: same as hostname
+    hostname: "{{dopla_domain}}"
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - ${DOPLA_INT_IP_CONTROLLER}:8181:80
+    depends_on:
+      - openldap

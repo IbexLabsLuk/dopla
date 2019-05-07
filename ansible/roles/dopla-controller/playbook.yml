@@ -1,0 +1,6 @@
+---
+
+- name: "Provision the dopla controller, including directory, registry, logging and alerting."
+  hosts: all
+  roles:
+    - { role: dopla-controller }

@@ -1,0 +1,18 @@
+# Dopla admin mail
+dopla_admin_mail: admin@example.com
+
+# Volume directory
+dopla_volume_path: /volumes
+
+# Volumes to precreate
+dopla_volumes:
+  - vol01
+  - vol02
+  - vol03
+  - vol04
+  - vol05
+  - vol06
+  - vol07
+  - vol08
+  - vol09
+  - vol10

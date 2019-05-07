@@ -1,0 +1,19 @@
+---
+- name: "Provision the dopla base configuration"
+  hosts: dopla-base
+  become: true
+  roles:
+    - { role: dopla-base }
+    - { role: dopla-docker }
+
+- name: "Prepare the node for RKE"
+  hosts: dopla-rke
+  become: true
+  roles:
+    - { role: dopla-rke }
+
+- name: "Provision DoPla controller"
+  hosts: dopla-controller
+  become: true
+  roles:
+    - { role: dopla-controller }

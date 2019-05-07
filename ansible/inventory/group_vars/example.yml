@@ -1,0 +1,52 @@
+# Those are the most basic variables for dopla roles.
+# For more specific configuration (e.g. Custom tinc subnet) see:
+# - roles/dopla-base/defaults/main.yml
+# - roles/dopla-controller/defaults/main.yml
+# - roles/dopla-docker/defaults/main.yml
+# - roles/dopla-rke/defaults/main.yml
+
+# Domain for dopla
+dopla_domain: example.com
+# Dopla admin mail
+dopla_admin_mail: admin@example.com
+
+# Controller hostname (default: Controller)
+dopla_host_controller: controller
+# Controller IP (default: 192.168.254.1/24)
+dopla_int_ip_controller: 192.168.254.1
+# Logs (Kibana) IP (default: 192.168.254.1/24, as controller)
+dopla_host_logging: logs
+dopla_int_ip_logging: 192.168.254.1
+# Internal logging hostname
+dopla_host_ldap: ldap
+dopla_int_ip_ldap: 192.168.254.1
+
+# Tinc network name (default: dopla)
+dopla_tinc_network: dopla
+
+dopla_registries:
+  - #registry_url: "https://index.docker.io/v1/"
+    username: "dockeruser"
+    password: "dockerpass"
+    email: "admin@example.com"
+    #reauthorize: false
+    #config_path: "$HOME/.docker/config.json"
+    #state: "present"
+
+# LDAP
+# LDAP Organization
+dopla_ldap_org: "Example LLC"
+# LDAP Admin Password
+dopla_ldap_admin_pass: "pass123"
+# LDAP Config Password
+dopla_ldap_config_pass: "pass123"
+
+# DNS
+# Default DNS admin user
+dopla_dns_admin_user: "admin"
+# Default DNS admin user password:
+dopla_dns_admin_pass: "pass123"
+# Default upstream dns
+dopla_dns_upstream:
+  - 8.8.8.8
+  - 8.8.4.4

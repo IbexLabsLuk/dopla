@@ -1,0 +1,5 @@
+---
+- name: "Provision the Docker on dopla nodes."
+  hosts: all
+  roles:
+    - { role: dopla-docker }

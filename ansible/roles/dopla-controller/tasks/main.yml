@@ -1,0 +1,100 @@
+---
+# Install Compose
+#- name: Install Docker Compose
+#  become: true
+#  action: >
+#    {{ ansible_pkg_mgr }} name=docker-compose state=present update_cache=yes
+
+# Deploy Config Files for Single Host
+- template:
+    src: ../templates/dopla.conf.j2
+    dest: /etc/dopla/dopla.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+
+- name: Copy controller stack compose file
+  copy:
+    src: ../files/docker-compose.yml
+    dest: /etc/dopla/docker-compose.yml
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+- copy:
+    src: ../files/startup.sh
+    dest: /etc/dopla/startup.sh
+    owner: root
+    group: root
+    mode: 0755
+    backup: no
+
+# DNS Setup
+- name: Create DNS config directory.
+  become: true
+  file: 
+    path: /etc/dopla/dns
+    state: directory
+- name: Create init template
+  template:
+    src: ../templates/dnsmasq.conf.j2
+    dest: /etc/dopla/dns/dnsmasq.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+
+# Setup yaml templates for clusters
+- name: Create Cluster config directory.
+  become: true
+  file: 
+    path: /etc/dopla/clusters
+    state: directory
+- name: Create init template
+  template:
+    src: ../templates/dopla-init.yaml.j2
+    dest: /etc/dopla/clusters/dopla-init.yaml
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+- name: Create storage template
+  template:
+    src: ../templates/local-storage.yaml.j2
+    dest: /etc/dopla/clusters/local-storage.yaml
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+- name: Create Letsencrypt issuer yaml template.
+  template:
+    src: ../templates/letsencrypt-cluster-issuer.yaml.j2
+    dest: /etc/dopla/clusters/letsencrypt-cluster-issuer.yaml
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+- name: Create demolicious demo application template
+  template:
+    src: ../templates/demolicious.yaml.j2
+    dest: /etc/dopla/clusters/demolicious.yaml
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+
+# Service Configuration starts here
+# ---------------------------------
+- name: "Adjust vm.max_map_count to run ELK"
+  become: true
+  sysctl:
+    name: vm.max_map_count
+    value: 262144
+    state: present
+    
+# Now deploy the dopla stack
+# --------------------------
+- name: "Init Dopla default stack on master node."
+  become: true
+  raw: cd /etc/dopla && ./startup.sh

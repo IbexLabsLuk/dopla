@@ -1,0 +1,6 @@
+---
+
+- name: "Provision the dopla base configuration"
+  hosts: all
+  roles:
+    - { role: dopla-base }

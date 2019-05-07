@@ -1,0 +1,9 @@
+[submodule "ansible/roles/ansible-dockerswarm"]
+	path = ansible/roles/atosatto.docker-swarm
+	url = https://github.com/atosatto/ansible-dockerswarm.git
+[submodule "ansible/roles/secure-docker-daemon"]
+	path = ansible/roles/ansible.secure-docker-daemon
+	url = https://github.com/ansible/role-secure-docker-daemon.git
+[submodule "ansible/roles/ansible-netplan"]
+	path = ansible/roles/ansible-netplan
+	url = https://github.com/mrlesmithjr/ansible-netplan.git

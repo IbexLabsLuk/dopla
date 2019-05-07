@@ -1,0 +1,25 @@
+---
+# Default IP for the bridge of the internal interface.
+dopla_ip: 192.168.254.1
+dopla_ip_cidr: 24
+# Internal domain
+dopla_domain: example.com
+# Controller hostname
+dopla_host_controller: controller
+dopla_int_ip_controller: 192.168.254.1
+# Internal logging hostname
+dopla_host_logging: logging
+dopla_int_ip_logging: 192.168.254.1
+# Dopla Upstream DNS
+dopla_dns_upstream: [8.8.8.8, 8.8.4.4]
+# Dopla internal dns resolvers, currently DNS is installed only on controller.
+dopla_int_dns:
+  - "{{dopla_int_ip_controller}}"
+
+# Tinc network name
+dopla_tinc_network: dopla
+
+# Netplan default settings.
+netplan_config_file: /etc/netplan/02-dopla.yaml
+netplan_renderer: networkd
+netplan_remove_existing: false

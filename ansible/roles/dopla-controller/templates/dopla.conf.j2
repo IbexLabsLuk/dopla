@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# Configuration file for docker environment
+#
+# Tags to use for this stack (edge=development, latest=stable)
+
+# Export dopla settings.
+export DOPLA_DOMAIN="{{dopla_domain}}"
+export DOPLA_ADMIN_MAIL="{{dopla_admin_mail}}"
+
+# Dopla controller with Rancher, ELK, Prometheus.
+export CONTROLLER_HOST="{{dopla_host_controller}}"
+export DOPLA_INT_IP_CONTROLLER="{{dopla_int_ip_controller}}"
+
+# Kibana
+export LOGGING_HOST="{{dopla_host_logging}}"
+export DOPLA_INT_IP_LOGGING="{{dopla_int_ip_logging}}"
+
+# LDAP
+export DOPLA_LDAP_ORG="{{dopla_ldap_org}}"
+export DOPLA_LDAP_ADMIN_PASS="{{dopla_ldap_admin_pass}}"
+export DOPLA_LDAP_CONFIG_PASS="{{dopla_ldap_config_pass}}"
+
+# DNS ADMIN
+export DOPLA_DNS_ADMIN_USER="{{dopla_dns_admin_user}}"
+export DOPLA_DNS_ADMIN_PASS="{{dopla_dns_admin_pass}}"

@@ -1,0 +1,21 @@
+#dnsmasq config, for a complete example, see:
+#  http://oss.segetech.com/intra/srv/dnsmasq.conf
+#log all dns queries
+log-queries
+#dont use hosts nameservers
+no-resolv
+
+# Use the default upstream nameservers
+{% for dns in dopla_dns_upstream %}
+server={{dns}}
+{% endfor %}
+
+#serve all .company queries using a specific nameserver
+address=/{{dopla_host_controller}}.{{dopla_domain}}/{{dopla_int_ip_controller}}
+address=/{{dopla_host_logging}}.{{dopla_domain}}/{{dopla_int_ip_logging}}
+address=/{{dopla_host_ldap}}.{{dopla_domain}}/{{dopla_int_ip_ldap}}
+
+# Addresses for every host in network
+{% for host in groups['dopla-base'] %}
+address=/{{host}}/{{ hostvars[host].dopla_ip }}
+{% endfor %}

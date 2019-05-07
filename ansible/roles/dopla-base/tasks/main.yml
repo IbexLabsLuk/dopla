@@ -1,0 +1,144 @@
+---
+# Do all the system updates. We dont want to deploy on an outdated system.
+- name: Install Ubuntu updates
+  apt: upgrade=dist update_cache=yes
+  when: ansible_distribution == "Ubuntu"
+
+# Dopla Bridge Configuration Setup
+# Create a Bridge named dopla0 with the ip 10.10.10.10/24
+# See: https://github.com/mrlesmithjr/ansible-netplan/blob/master/defaults/main.yml
+- name: Create internal bridge
+  include_role:
+    name: mrlesmithjr.netplan
+  vars:
+    netplan_config_file: /etc/netplan/02-dopla.yaml
+    netplan_renderer: networkd
+    netplan_remove_existing: false
+    netplan_configuration:
+      network:
+        version: 2
+        bridges:
+          dopla0:
+            addresses: ["{{dopla_ip}}/{{ dopla_ip_cidr }}"]
+            parameters:
+              stp: true
+              forward-delay: 0
+            nameservers:
+              addresses: "{{dopla_int_dns}}"
+              search:
+                - "{{dopla_domain}}"
+
+- name: Reloading network configuration
+  become: true
+  raw: netplan apply
+
+# Install and configure tinc
+# See: https://github.com/thisismitch/ansible-tinc
+- name: "Workaround for agjarlag.tinc, hosts file / dir needs to exist."
+  file:
+    path: /etc/tinc/{{ dopla_tinc_network }}/hosts
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+    recurse: true
+- file:
+    path: /etc/tinc/{{ dopla_tinc_network }}/hosts/{{ajgarlag_tinc_node_name}}
+    state: touch
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Adding the vpn node names to hosts file."
+  lineinfile: 
+    dest: /etc/hosts
+    regexp: '.*{{ hostvars[item].ajgarlag_tinc_node_name }}.*'
+    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{hostvars[item].ajgarlag_tinc_node_name}}"
+    state: present
+  when: hostvars[item].ansible_default_ipv4.address is defined
+  with_inventory_hostnames:
+    - dopla-base
+
+- name: "Adding the controller internal ip to the hosts file"
+  lineinfile: 
+    dest: /etc/hosts
+    regexp: '.*{{dopla_host_controller}}.*'
+    line: "{{ dopla_int_ip_controller }} {{dopla_host_controller}} {{dopla_host_controller}}.{{dopla_domain}}"
+    state: present
+- name: "Adding the logging internal ip to the hosts file"
+  lineinfile: 
+    dest: /etc/hosts
+    regexp: '.*{{dopla_host_logging}}.*'
+    line: "{{ dopla_int_ip_logging }} {{dopla_host_logging}} {{dopla_host_logging}}.{{dopla_domain}}"
+    state: present
+
+- name: Configure Tinc VPN
+  include_role:
+    name: ajgarlag.tinc
+  vars:
+    ajgarlag_tinc_network: "{{dopla_tinc_network}}"
+    ajgarlag_tinc_network_autostart: true
+    ajgarlag_tinc_network_directives:
+      Name: "{{ajgarlag_tinc_node_name}}"
+      AddressFamily: ipv4
+      Interface: tun0
+      Port: 655
+      Mode: switch
+      BindToAddress: "{{ ansible_default_ipv4.address }} 655"
+    ajgarlag_tinc_network_nodes_group: dopla-base
+    ajgarlag_tinc_node_public_address: '{{ ansible_default_ipv4.address }}'
+    ajgarlag_tinc_node_address: "{{dopla_ip}}/{{dopla_ip_cidr}}"
+    ajgarlag_tinc_node_up_script: |
+      #!/bin/bash
+      ip link set $INTERFACE up
+      ip link set $INTERFACE master dopla0
+    ajgarlag_tinc_node_down_script: |
+      #!/bin/bash
+      ip link set $INTERFACE down
+
+- name: Enable tinc network
+  systemd:
+    name: tinc@dopla
+    enabled: yes
+    state: restarted
+
+# Dopla Config directory setup
+- name: Create DoPla config directories
+  become: true
+  file: 
+    path: /etc/dopla
+    state: directory
+- file:
+    path: /etc/dopla/conf.d
+    state: directory
+    
+# Copy DoPla Binary and install 
+- name: Copy DoPla Binary - Currently only a skeleton for later use
+  become: true
+  copy:
+    src: ../files/dopla.py
+    dest: /usr/bin/dopla
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install pip3
+  become: true
+  action: >
+    {{ ansible_pkg_mgr }} name=python3-pip state=present update_cache=no
+
+- pip:
+    name: setuptools
+    state: present
+- pip:
+    name: ahab
+    state: present
+- pip:
+    name: docker-py
+    state: present
+    
+# Install Fail2Ban
+- name: Install fail2ban
+  become: true
+  action: >
+    {{ ansible_pkg_mgr }} name=fail2ban state=present update_cache=no

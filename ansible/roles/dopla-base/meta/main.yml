@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Lukas Meyer
+  description: Ansible role to configure a DoPla base host.
+  license: MIT
+  min_ansible_version: 2.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - bionic
+  categories:
+    - datacenter
+# dependencies:
+#   - role: mrlesmithjr.netplan
+#     vars:
+#       netplan_config_file: /etc/netplan/dopla.yaml
+#       netplan_renderer: networkd
+#       netplan_remove_existing: false
