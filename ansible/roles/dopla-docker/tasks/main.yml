@@ -10,6 +10,21 @@
   register: dopla_dns_ips
 - set_fact: dopla_int_dns="{{ dopla_dns_ips.results | map(attribute='ansible_facts.dopla_dns_ip') | list }}"
 
+- name: Install root docker config
+  become: true
+    file:
+      path: "/root/.docker"
+      state: directory
+      mode: 0777
+- copy:
+    src: ../files/docker-compose.yml
+    dest: /etc/dopla/docker-compose.yml
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+    force: no
+
 - name: Install docker, docker-python and all the dependencies.
   include_role:
     name: nickjj.docker
