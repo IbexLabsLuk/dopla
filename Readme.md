@@ -109,6 +109,24 @@ dopla_dns_upstream:
   - 8.8.8.8
   - 8.8.4.4
 ```
+### Determine whether volumes are managed by DoPla
+DoPla can manage LVM volumes for /var/lib/docker and the kubernetes local volume path:
+```yaml
+# Dopla docker volume name
+dopla_docker_vol_name: k8spv
+# Dopla docker volume size
+dopla_docker_vol_size: 50G
+# Dopla k8s volumes volume name
+dopla_k8s_vol_name: k8spv
+# Dopla k8s volumes volume size
+dopla_k8s_vol_size: 50G
+# Dopla host volume group
+dopla_host_vg: system
+# Use dopla to manage the volumes - SET TO FALSE FOR HOSTS THAT HAVE NO VOLUMES MANAGED BY DOPLA
+dopla_manage_vols: true
+# Dopla default fs for docker and k8s volumes
+dopla_host_fstype: ext4
+```
 ### Install DoPla on the target hosts
 Run the playbook on your platform hosts:
 ```bash
