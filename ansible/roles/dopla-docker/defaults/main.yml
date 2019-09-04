@@ -17,3 +17,11 @@ dopla_dns_upstream: [8.8.8.8, 8.8.4.4]
 dopla_int_dns: []
 # Dopla registries
 dopla_registries: []
+# Dopla docker volume name
+dopla_docker_vol_name: docker
+# Dopla docker volume size
+dopla_docker_vol_size: 10G
+# Dopla host volume group
+dopla_host_vg: system
+# Use dopla to manage the volumes
+dopla_manage_vols: yes

@@ -25,6 +25,32 @@
     backup: no
     force: no
 
+- name: Create k8s LVM volume
+  become: true
+  lvol:
+    state: "present"
+    vg: {{dopla_host_vg}}
+    lv: {{dopla_k8s_vol_name}}
+    force: no
+    shrink: no
+    size: {{dopla_k8s_vol_size}}
+    when: {{dopla_manage_vols}} == "yes"
+- become: true
+  filesystem:
+    force: no
+    dev: /dev/{{dopla_host_vg}}/{{dopla_k8s_vol_name}}
+    fstype: {{dopla_host_fstype}}
+    resizefs: yes
+    when: {{dopla_manage_vols}} == "yes"
+- become: true
+  mount:
+    state: "mounted"
+    boot: yes
+    path: /var/lib/docker
+    opts: defaults
+    src: /dev/{{dopla_host_vg}}/{{dopla_k8s_vol_name}}
+    when: {{dopla_manage_vols}} == "yes"
+
 - name: Install docker, docker-python and all the dependencies.
   include_role:
     name: nickjj.docker
