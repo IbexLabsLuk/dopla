@@ -239,6 +239,30 @@ To keep a volume for a specific app can be useful and is simple: A volume stays 
 
 If you deleted the volume claim you can preserve the PV by deleting the now released volume declaration but not the folders. Then create the PV and the volume claim again.
 
+### Using LDAP
+DoPla pre-installs an LDAP-Server with phpldapadmin. The server is preconfigured with your domain and admin password:
+```yaml
+# dopla_domain is also your default domain for ldap.
+dopla_domain: example.com
+
+# LDAP
+# LDAP Organization
+dopla_ldap_org: "example.com private site"
+# LDAP Admin Password
+dopla_ldap_admin_pass: "changeme1"
+# LDAP Config Password
+dopla_ldap_config_pass: "changeme2"
+
+```
+
+To maintain the LDAP ldap forward the port 8181 from the controller machine to your localhost:
+````bash
+$> ssh -L localhost:8181:192.168.254.1:8181 user@controller.example.com
+````
+You can now reach phpldapadmin at http://localhost:88181
+
+Configure applications to use the LDAP directory by connecting to the controller over the internal tinc network where LDAP is exposed.
+
 ## Known Issues
 - Only local storage is supported out of the box.
 - It should be possible to roll out logging on a seperate host because ELK eats RAM. If you want logging at the moment, ensure your controller node has AT LEAST 24 GB of RAM.
