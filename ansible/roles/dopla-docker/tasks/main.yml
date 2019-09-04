@@ -17,8 +17,8 @@
     state: directory
     mode: 0777
 - copy:
-    src: ../files/docker-compose.yml
-    dest: /etc/dopla/docker-compose.yml
+    src: ../files/config.json
+    dest: /root/.docker/config.json
     owner: root
     group: root
     mode: 0644
