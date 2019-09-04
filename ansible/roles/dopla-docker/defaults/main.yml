@@ -24,4 +24,6 @@ dopla_docker_vol_size: 10G
 # Dopla host volume group
 dopla_host_vg: system
 # Use dopla to manage the volumes
-dopla_manage_vols: yes
+dopla_manage_vols: true
+# Dopla default fs for docker and k8s volumes
+dopla_host_fstype: ext4

@@ -12,10 +12,10 @@
 
 - name: Install root docker config
   become: true
-    file:
-      path: "/root/.docker"
-      state: directory
-      mode: 0777
+  file:
+    path: "/root/.docker"
+    state: directory
+    mode: 0777
 - copy:
     src: ../files/docker-compose.yml
     dest: /etc/dopla/docker-compose.yml
@@ -25,31 +25,32 @@
     backup: no
     force: no
 
-- name: Create k8s LVM volume
+- name: Create docker LVM volume
   become: true
   lvol:
     state: "present"
-    vg: {{dopla_host_vg}}
-    lv: {{dopla_k8s_vol_name}}
+    vg: "{{dopla_host_vg}}"
+    lv: "{{dopla_docker_vol_name}}"
     force: no
     shrink: no
-    size: {{dopla_k8s_vol_size}}
-    when: {{dopla_manage_vols}} == "yes"
+    size: "{{dopla_docker_vol_size}}"
+  when: dopla_manage_vols|bool
 - become: true
   filesystem:
     force: no
-    dev: /dev/{{dopla_host_vg}}/{{dopla_k8s_vol_name}}
-    fstype: {{dopla_host_fstype}}
+    dev: "/dev/{{dopla_host_vg}}/{{dopla_docker_vol_name}}"
+    fstype: "{{dopla_host_fstype}}"
     resizefs: yes
-    when: {{dopla_manage_vols}} == "yes"
+  when: dopla_manage_vols|bool
 - become: true
   mount:
     state: "mounted"
     boot: yes
     path: /var/lib/docker
+    fstype: "{{dopla_host_fstype}}"
     opts: defaults
-    src: /dev/{{dopla_host_vg}}/{{dopla_k8s_vol_name}}
-    when: {{dopla_manage_vols}} == "yes"
+    src: "/dev/{{dopla_host_vg}}/{{dopla_docker_vol_name}}"
+  when: dopla_manage_vols|bool
 
 - name: Install docker, docker-python and all the dependencies.
   include_role:

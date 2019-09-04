@@ -18,10 +18,12 @@ dopla_volumes:
   - vol10
 
 # Dopla docker volume name
-dopla_k8s_vol_name: k8spvs
+dopla_k8s_vol_name: k8spv
 # Dopla docker volume size
 dopla_k8s_vol_size: 50G
 # Dopla host volume group
 dopla_host_vg: system
 # Use dopla to manage the volumes
-dopla_manage_vols: yes
+dopla_manage_vols: true
+# Dopla default fs for docker and k8s volumes
+dopla_host_fstype: ext4

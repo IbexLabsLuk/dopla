@@ -4,6 +4,32 @@
     path: "{{dopla_volume_path}}"
     state: directory
     mode: 0755
+- name: Create k8s LVM volume
+  become: true
+  lvol:
+    state: "present"
+    vg: "{{dopla_host_vg}}"
+    lv: "{{dopla_k8s_vol_name}}"
+    force: no
+    shrink: no
+    size: "{{dopla_k8s_vol_size}}"
+  when: dopla_manage_vols|bool
+- become: true
+  filesystem:
+    force: no
+    dev: "/dev/{{dopla_host_vg}}/{{dopla_k8s_vol_name}}"
+    fstype: "{{dopla_host_fstype}}"
+    resizefs: yes
+  when: dopla_manage_vols|bool
+- become: true
+  mount:
+    state: "mounted"
+    boot: yes
+    path: "{{dopla_volume_path}}"
+    fstype: "{{dopla_host_fstype}}"
+    opts: defaults
+    src: "/dev/{{dopla_host_vg}}/{{dopla_k8s_vol_name}}"
+  when: dopla_manage_vols|bool
 - become: true
   file: 
     path: "{{dopla_volume_path}}/pvs"
