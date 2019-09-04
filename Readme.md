@@ -259,7 +259,7 @@ To maintain the LDAP ldap forward the port 8181 from the controller machine to y
 ````bash
 $> ssh -L localhost:8181:192.168.254.1:8181 user@controller.example.com
 ````
-You can now reach phpldapadmin at http://localhost:88181
+You can now reach phpldapadmin at http://localhost:8181
 
 Configure applications to use the LDAP directory by connecting to the controller over the internal tinc network where LDAP is exposed.
 
