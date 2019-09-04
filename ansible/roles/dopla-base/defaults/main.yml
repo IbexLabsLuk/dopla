@@ -23,3 +23,5 @@ dopla_tinc_network: dopla
 netplan_config_file: /etc/netplan/02-dopla.yaml
 netplan_renderer: networkd
 netplan_remove_existing: false
+# This prevents search domain from being added.
+dopla_host_search_domain: true

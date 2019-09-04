@@ -268,4 +268,8 @@ Configure applications to use the LDAP directory by connecting to the controller
 - It should be possible to roll out logging on a seperate host because ELK eats RAM. If you want logging at the moment, ensure your controller node has AT LEAST 24 GB of RAM.
 - Local Storage volumes are the same for every node in every cluster.
 - A lot of the recipes could be better, e.g. read host names from roles instead of hardwiring the dopla-base group name
-- Split horizon DNS can interfere with internal K8s DNS and search domains. If necessary deactivate search domain and configure the DNS servers in /etc/systemd/systemd-resolved.conf.
+- Split horizon DNS can interfere with internal K8s DNS and search domains. If necessary deactivate search domain and configure the DNS servers in /etc/systemd/systemd-resolved.conf. Setting this parameter for a hosts removes the search domain:
+```yaml
+# This set to false prevents search domain from being added.
+dopla_host_search_domain: true
+```

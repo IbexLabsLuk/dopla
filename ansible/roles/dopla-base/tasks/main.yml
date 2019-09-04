@@ -27,6 +27,25 @@
               addresses: "{{dopla_int_dns}}"
               search:
                 - "{{dopla_domain}}"
+  when: dopla_host_search_domain|bool
+- include_role:
+    name: mrlesmithjr.netplan
+  vars:
+    netplan_config_file: /etc/netplan/02-dopla.yaml
+    netplan_renderer: networkd
+    netplan_remove_existing: false
+    netplan_configuration:
+      network:
+        version: 2
+        bridges:
+          dopla0:
+            addresses: ["{{dopla_ip}}/{{ dopla_ip_cidr }}"]
+            parameters:
+              stp: true
+              forward-delay: 0
+            nameservers:
+              addresses: "{{dopla_int_dns}}"
+  when: dopla_host_search_domain|bool is False
 
 - name: Reloading network configuration
   become: true
